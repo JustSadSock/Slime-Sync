@@ -41,17 +41,20 @@ class GameClient {
 
   private setupEventListeners(): void {
     // Mouse movement
-    this.app.view.addEventListener('mousemove', (e: MouseEvent) => {
-      const rect = (this.app.view as HTMLCanvasElement).getBoundingClientRect();
-      this.mousePosition.x = e.clientX - rect.left;
-      this.mousePosition.y = e.clientY - rect.top;
+    const canvas = this.app.view as HTMLCanvasElement;
+    canvas.addEventListener('mousemove', (e: Event) => {
+      const mouseEvent = e as unknown as MouseEvent;
+      const rect = canvas.getBoundingClientRect();
+      this.mousePosition.x = mouseEvent.clientX - rect.left;
+      this.mousePosition.y = mouseEvent.clientY - rect.top;
     });
 
     // Touch movement for mobile
-    this.app.view.addEventListener('touchmove', (e: TouchEvent) => {
+    canvas.addEventListener('touchmove', (e: Event) => {
       e.preventDefault();
-      const rect = (this.app.view as HTMLCanvasElement).getBoundingClientRect();
-      const touch = e.touches[0];
+      const touchEvent = e as unknown as TouchEvent;
+      const rect = canvas.getBoundingClientRect();
+      const touch = touchEvent.touches[0];
       this.mousePosition.x = touch.clientX - rect.left;
       this.mousePosition.y = touch.clientY - rect.top;
     });

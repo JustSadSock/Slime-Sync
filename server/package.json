@@ -2,10 +2,11 @@
   "name": "@slime-sync/server",
   "version": "1.0.0",
   "description": "WebSocket server for Slime-Sync",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node src/index.ts",
+    "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "watch": "tsc --watch"
   },
@@ -19,7 +20,7 @@
   "devDependencies": {
     "@types/node": "^20.11.5",
     "@types/ws": "^8.5.10",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }
 }
