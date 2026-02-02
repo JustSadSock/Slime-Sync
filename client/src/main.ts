@@ -19,6 +19,10 @@ import {
   clampPlayerPosition,
 } from '@slime-sync/shared';
 
+// Mobile controls
+const DASH_BUTTON_SIZE = 80; // size of dash button touch area
+const DASH_BUTTON_OFFSET = 50; // position offset from bottom-right corner
+
 interface PendingInput {
   seq: number;
   dt: number;
@@ -140,7 +144,7 @@ class Game {
       const y = e.clientY - rect.top;
       
       // Right side is dash button
-      if (x > WORLD_WIDTH - 80 && y > WORLD_HEIGHT - 80) {
+      if (x > WORLD_WIDTH - DASH_BUTTON_SIZE && y > WORLD_HEIGHT - DASH_BUTTON_SIZE) {
         this.dashButtonActive = true;
         this.dashRequested = true;
         e.preventDefault();
@@ -486,6 +490,9 @@ class Game {
   
   private interpolateOtherPlayers(): void {
     const now = performance.now();
+    // Calculate render time in the past to smooth out network jitter
+    // We use server time offset to convert to server timeline, then subtract INTERPOLATION_DELAY
+    // to render slightly behind the latest snapshot for smooth interpolation
     const renderTime = now + this.serverTimeOffset - INTERPOLATION_DELAY;
     
     for (const player of this.otherPlayers.values()) {
@@ -607,8 +614,8 @@ class Game {
   }
   
   private drawDashButton(): void {
-    const x = WORLD_WIDTH - 50;
-    const y = WORLD_HEIGHT - 50;
+    const x = WORLD_WIDTH - DASH_BUTTON_OFFSET;
+    const y = WORLD_HEIGHT - DASH_BUTTON_OFFSET;
     const radius = 30;
     
     this.ctx.fillStyle = this.dashButtonActive ? 'rgba(255, 100, 100, 0.8)' : 'rgba(255, 255, 255, 0.5)';
