@@ -22,6 +22,8 @@ import {
 // Mobile controls
 const DASH_BUTTON_SIZE = 80; // size of dash button touch area
 const DASH_BUTTON_OFFSET = 50; // position offset from bottom-right corner
+const JOYSTICK_MAX_DISTANCE = 50; // max distance from center for joystick
+const DEFAULT_WS_PORT = 3001; // default WebSocket port
 
 interface PendingInput {
   seq: number;
@@ -171,11 +173,10 @@ class Game {
         const dx = x - this.joystickStartX;
         const dy = y - this.joystickStartY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        const maxDistance = 50;
         
-        if (distance > maxDistance) {
-          this.joystickDx = (dx / distance) * maxDistance;
-          this.joystickDy = (dy / distance) * maxDistance;
+        if (distance > JOYSTICK_MAX_DISTANCE) {
+          this.joystickDx = (dx / distance) * JOYSTICK_MAX_DISTANCE;
+          this.joystickDy = (dy / distance) * JOYSTICK_MAX_DISTANCE;
         } else {
           this.joystickDx = dx;
           this.joystickDy = dy;
@@ -220,7 +221,7 @@ class Game {
     
     // Use secure WebSocket if page is served over HTTPS
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const defaultWsUrl = `${protocol}//localhost:3001/ws`;
+    const defaultWsUrl = `${protocol}//localhost:${DEFAULT_WS_PORT}/ws`;
     const wsUrl = import.meta.env.VITE_WS_URL || defaultWsUrl;
     
     this.ws = new WebSocket(wsUrl);
@@ -426,8 +427,8 @@ class Game {
     
     // Joystick input
     if (this.joystickActive) {
-      dx += this.joystickDx / 50;
-      dy += this.joystickDy / 50;
+      dx += this.joystickDx / JOYSTICK_MAX_DISTANCE;
+      dy += this.joystickDy / JOYSTICK_MAX_DISTANCE;
     }
     
     // Normalize
@@ -603,7 +604,7 @@ class Game {
     // Draw base
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
     this.ctx.beginPath();
-    this.ctx.arc(baseX, baseY, 50, 0, Math.PI * 2);
+    this.ctx.arc(baseX, baseY, JOYSTICK_MAX_DISTANCE, 0, Math.PI * 2);
     this.ctx.fill();
     
     // Draw stick

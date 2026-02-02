@@ -34,6 +34,7 @@ const SNAPSHOT_HZ = parseEnvInt('SNAPSHOT_HZ', process.env.SNAPSHOT_HZ, 15, 1, 6
 
 const TICK_INTERVAL = 1000 / TICK_HZ;
 const SNAPSHOT_INTERVAL = 1000 / SNAPSHOT_HZ;
+const SPAWN_RADIUS = 100; // random spawn offset from center
 
 interface PlayerState {
   id: string;
@@ -145,8 +146,8 @@ class GameServer {
       id: clientId,
       name: message.name || 'Anonymous',
       color: generateRandomColor(),
-      x: WORLD_WIDTH / 2 + (Math.random() - 0.5) * 100,
-      y: WORLD_HEIGHT / 2 + (Math.random() - 0.5) * 100,
+      x: WORLD_WIDTH / 2 + (Math.random() - 0.5) * SPAWN_RADIUS,
+      y: WORLD_HEIGHT / 2 + (Math.random() - 0.5) * SPAWN_RADIUS,
       vx: 0,
       vy: 0,
       anim: 'idle',
