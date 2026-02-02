@@ -19,11 +19,15 @@ import {
   clampPlayerPosition,
 } from '@slime-sync/shared';
 
+// Production server configuration
+const PRODUCTION_SERVER = 'irgri.uk';
+const PRODUCTION_WS_PATH = '/ws';
+
 // Mobile controls
 const DASH_BUTTON_SIZE = 80; // size of dash button touch area
 const DASH_BUTTON_OFFSET = 50; // position offset from bottom-right corner
 const JOYSTICK_MAX_DISTANCE = 50; // max distance from center for joystick
-const DEFAULT_WS_PORT = 3001; // default WebSocket port
+const DEFAULT_WS_PORT = 3001; // default WebSocket port for local development
 
 interface PendingInput {
   seq: number;
@@ -215,11 +219,21 @@ class Game {
     const name = this.playerNameInput.value.trim() || 'Player';
     this.playerName = name;
     
-    // Use secure WebSocket if page is served over HTTPS
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const defaultWsUrl = `${protocol}//localhost:${DEFAULT_WS_PORT}/ws`;
-    const wsUrl = import.meta.env.VITE_WS_URL || defaultWsUrl;
+    // Determine WebSocket URL
+    let wsUrl: string;
     
+    if (import.meta.env.VITE_WS_URL) {
+      // Use explicitly configured URL from environment
+      wsUrl = import.meta.env.VITE_WS_URL;
+    } else if (window.location.protocol === 'https:') {
+      // Production: Use secure WebSocket to irgri.uk
+      wsUrl = `wss://${PRODUCTION_SERVER}${PRODUCTION_WS_PATH}`;
+    } else {
+      // Development: Use local WebSocket server
+      wsUrl = `ws://localhost:${DEFAULT_WS_PORT}/ws`;
+    }
+    
+    console.log(`[Client] Connecting to WebSocket server: ${wsUrl}`);
     this.ws = new WebSocket(wsUrl);
     
     this.ws.addEventListener('open', () => {

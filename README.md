@@ -75,9 +75,10 @@ Open http://localhost:3000 in multiple browser tabs or devices on your network t
    - Click "New site from Git"
    - Select your repository
 
-3. **Configure Environment Variable**:
-   - In Netlify Site Settings → Environment Variables
-   - Add: `VITE_WS_URL` = `wss://your-domain.com/ws`
+3. **Configure Environment Variable** (Optional):
+   - By default, the client will connect to `wss://irgri.uk/ws` when served over HTTPS
+   - To use a custom server, add in Netlify Site Settings → Environment Variables:
+   - `VITE_WS_URL` = `wss://your-custom-domain.com/ws`
 
 4. **Deploy**:
    - Netlify will automatically build and deploy
@@ -85,6 +86,8 @@ Open http://localhost:3000 in multiple browser tabs or devices on your network t
    - Publish directory: `client/dist`
 
 ### Server Deployment (Windows + Cloudflare Tunnel)
+
+**Production Server**: The game server is hosted at `irgri.uk` via Cloudflare Tunnel.
 
 #### Step 1: Setup Cloudflare Tunnel
 
@@ -106,13 +109,15 @@ Open http://localhost:3000 in multiple browser tabs or devices on your network t
 
 4. **Configure DNS**:
    ```cmd
-   cloudflared tunnel route dns irgri-tunnel your-domain.com
+   cloudflared tunnel route dns irgri-tunnel irgri.uk
    ```
+   
+   This routes `irgri.uk` domain to the tunnel.
 
 5. **Create Configuration**:
    - Copy `cloudflared/config.example.yml`
    - Save to `C:\Users\YourUsername\.cloudflared\config.yml`
-   - Update with your tunnel UUID and domain
+   - Update with your tunnel UUID and set hostname to `irgri.uk`
 
 #### Step 2: Run Host Script
 

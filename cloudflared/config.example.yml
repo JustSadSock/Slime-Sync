@@ -14,14 +14,14 @@ credentials-file: C:\Users\YourUsername\.cloudflared\YOUR_TUNNEL_UUID.json
 # Ingress rules - route traffic to your local services
 ingress:
   # WebSocket endpoint - route /ws to local game server
-  - hostname: your-domain.com
+  - hostname: irgri.uk
     path: /ws
     service: ws://localhost:3001
     originRequest:
       noTLSVerify: true
   
   # HTTP health check endpoint
-  - hostname: your-domain.com
+  - hostname: irgri.uk
     path: /health
     service: http://localhost:3001
   
