@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Slime-Sync</title>
     <style>
       * {
@@ -12,23 +12,25 @@
       }
 
       body {
-        font-family: 'Arial', sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         overflow: hidden;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
+        touch-action: none;
       }
 
       #app {
         position: relative;
       }
 
-      #game-container {
-        border-radius: 10px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
+      #game-canvas {
+        display: block;
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        background: #1a1a2e;
       }
 
       #login-screen {
@@ -36,12 +38,13 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.98);
         padding: 40px;
-        border-radius: 10px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
         text-align: center;
         z-index: 1000;
+        min-width: 300px;
       }
 
       #login-screen.hidden {
@@ -50,8 +53,14 @@
 
       #login-screen h1 {
         color: #667eea;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         font-size: 32px;
+      }
+
+      #login-screen .subtitle {
+        color: #666;
+        margin-bottom: 20px;
+        font-size: 14px;
       }
 
       #login-screen input {
@@ -59,7 +68,7 @@
         padding: 12px;
         margin-bottom: 15px;
         border: 2px solid #ddd;
-        border-radius: 5px;
+        border-radius: 6px;
         font-size: 16px;
         transition: border-color 0.3s;
       }
@@ -75,50 +84,90 @@
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 6px;
         font-size: 18px;
+        font-weight: 600;
         cursor: pointer;
-        transition: transform 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s;
       }
 
       #login-screen button:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
       }
 
       #login-screen button:active {
-        transform: scale(0.95);
+        transform: translateY(0);
       }
 
-      #connection-status {
+      #debug-overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 10px 15px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: 'Courier New', monospace;
+        line-height: 1.6;
+        pointer-events: none;
+        z-index: 100;
+      }
+
+      #debug-overlay .status {
+        font-weight: bold;
+      }
+
+      #debug-overlay .connected {
+        color: #4ade80;
+      }
+
+      #debug-overlay .disconnected {
+        color: #ef4444;
+      }
+
+      #disconnect-btn {
         position: absolute;
         top: 10px;
         right: 10px;
         padding: 8px 16px;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(239, 68, 68, 0.9);
         color: white;
-        border-radius: 5px;
+        border: none;
+        border-radius: 6px;
         font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
         z-index: 100;
+        transition: background 0.2s;
       }
 
-      #connection-status.connected {
-        background: rgba(34, 197, 94, 0.8);
+      #disconnect-btn:hover {
+        background: rgba(220, 38, 38, 0.9);
       }
 
-      #connection-status.disconnected {
-        background: rgba(239, 68, 68, 0.8);
+      #disconnect-btn.hidden {
+        display: none;
       }
 
-      #player-count {
+      .controls-hint {
         position: absolute;
-        top: 10px;
+        bottom: 10px;
         left: 10px;
-        padding: 8px 16px;
+        padding: 8px 12px;
         background: rgba(0, 0, 0, 0.7);
         color: white;
-        border-radius: 5px;
-        font-size: 14px;
+        border-radius: 6px;
+        font-size: 12px;
         z-index: 100;
+        display: none;
+      }
+
+      @media (min-width: 768px) {
+        .controls-hint {
+          display: block;
+        }
       }
     </style>
   </head>
@@ -126,13 +175,33 @@
     <div id="app">
       <div id="login-screen">
         <h1>🟢 Slime-Sync</h1>
-        <input type="text" id="player-name" placeholder="Enter your name" maxlength="20" />
-        <button id="join-button">Join Game</button>
+        <div class="subtitle">Real-time Multiplayer MVP</div>
+        <input 
+          type="text" 
+          id="player-name" 
+          placeholder="Enter your name" 
+          maxlength="20" 
+          autocomplete="off"
+        />
+        <button id="connect-button">Connect</button>
       </div>
-      <div id="connection-status" class="disconnected">Disconnected</div>
-      <div id="player-count">Players: 0</div>
-      <div id="game-container"></div>
+      
+      <canvas id="game-canvas" width="800" height="450"></canvas>
+      
+      <div id="debug-overlay">
+        <div>Status: <span class="status disconnected">Disconnected</span></div>
+        <div>RTT: <span id="rtt">-</span> ms</div>
+        <div>Players: <span id="player-count">0</span></div>
+        <div>Seq: <span id="input-seq">0</span></div>
+      </div>
+      
+      <button id="disconnect-btn" class="hidden">Disconnect</button>
+      
+      <div class="controls-hint">
+        WASD or Arrow Keys to move • Space to Dash
+      </div>
     </div>
+    
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
