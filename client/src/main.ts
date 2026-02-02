@@ -15,10 +15,9 @@ import {
   PLAYER_SPEED,
   INTERPOLATION_DELAY,
   RECONCILIATION_THRESHOLD,
+  SNAPSHOT_RETENTION_MS,
   clampPlayerPosition,
 } from '@slime-sync/shared';
-
-const SNAPSHOT_RETENTION_MS = 1000;
 
 interface PendingInput {
   seq: number;
@@ -215,7 +214,10 @@ class Game {
     const name = this.playerNameInput.value.trim() || 'Player';
     this.playerName = name;
     
-    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3001/ws';
+    // Use secure WebSocket if page is served over HTTPS
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const defaultWsUrl = `${protocol}//localhost:3001/ws`;
+    const wsUrl = import.meta.env.VITE_WS_URL || defaultWsUrl;
     
     this.ws = new WebSocket(wsUrl);
     

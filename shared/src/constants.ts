@@ -11,3 +11,4 @@ export const DASH_COOLDOWN = 2000; // ms
 
 export const INTERPOLATION_DELAY = 100; // ms
 export const RECONCILIATION_THRESHOLD = 5; // units - max difference before correction
+export const SNAPSHOT_RETENTION_MS = 1000; // ms - how long to keep old snapshots for interpolation

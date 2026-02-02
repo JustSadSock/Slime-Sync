@@ -17,10 +17,20 @@ import {
   DASH_COOLDOWN,
 } from '@slime-sync/shared';
 
-// Configuration from environment variables
-const PORT = parseInt(process.env.PORT || '3001', 10);
-const TICK_HZ = parseInt(process.env.TICK_HZ || '30', 10);
-const SNAPSHOT_HZ = parseInt(process.env.SNAPSHOT_HZ || '15', 10);
+// Configuration from environment variables with validation
+function parseEnvInt(value: string | undefined, defaultValue: number, min: number, max: number): number {
+  if (!value) return defaultValue;
+  const parsed = parseInt(value, 10);
+  if (isNaN(parsed) || parsed < min || parsed > max) {
+    console.warn(`Invalid value "${value}", using default ${defaultValue}`);
+    return defaultValue;
+  }
+  return parsed;
+}
+
+const PORT = parseEnvInt(process.env.PORT, 3001, 1, 65535);
+const TICK_HZ = parseEnvInt(process.env.TICK_HZ, 30, 1, 120);
+const SNAPSHOT_HZ = parseEnvInt(process.env.SNAPSHOT_HZ, 15, 1, 60);
 
 const TICK_INTERVAL = 1000 / TICK_HZ;
 const SNAPSHOT_INTERVAL = 1000 / SNAPSHOT_HZ;
