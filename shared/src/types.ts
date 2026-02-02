@@ -3,27 +3,14 @@
 export enum MessageType {
   // Client -> Server
   JOIN = 'join',
-  MOVE = 'move',
+  INPUT = 'input',
   PING = 'ping',
   
   // Server -> Client
   WELCOME = 'welcome',
-  PLAYER_JOINED = 'player_joined',
-  PLAYER_LEFT = 'player_left',
-  STATE_UPDATE = 'state_update',
+  SNAPSHOT = 'snapshot',
   PONG = 'pong',
-}
-
-export interface Position {
-  x: number;
-  y: number;
-}
-
-export interface Player {
-  id: string;
-  position: Position;
-  color: string;
-  name: string;
+  PLAYER_LEFT = 'player_left',
 }
 
 // Base message interface
@@ -34,46 +21,60 @@ export interface BaseMessage {
 // Client -> Server messages
 export interface JoinMessage extends BaseMessage {
   type: MessageType.JOIN;
-  name: string;
+  name?: string;
 }
 
-export interface MoveMessage extends BaseMessage {
-  type: MessageType.MOVE;
-  position: Position;
+export interface InputMessage extends BaseMessage {
+  type: MessageType.INPUT;
+  seq: number;
+  dt: number;
+  dx: number;
+  dy: number;
+  dash: boolean;
+  clientTime: number;
 }
 
 export interface PingMessage extends BaseMessage {
   type: MessageType.PING;
-  timestamp: number;
+  t: number;
 }
 
 // Server -> Client messages
 export interface WelcomeMessage extends BaseMessage {
   type: MessageType.WELCOME;
   playerId: string;
-  players: Player[];
+  serverTime: number;
 }
 
-export interface PlayerJoinedMessage extends BaseMessage {
-  type: MessageType.PLAYER_JOINED;
-  player: Player;
+export interface PlayerSnapshot {
+  id: string;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  anim: string;
+  name: string;
+  color: string;
 }
 
-export interface PlayerLeftMessage extends BaseMessage {
-  type: MessageType.PLAYER_LEFT;
-  playerId: string;
-}
-
-export interface StateUpdateMessage extends BaseMessage {
-  type: MessageType.STATE_UPDATE;
-  players: Player[];
+export interface SnapshotMessage extends BaseMessage {
+  type: MessageType.SNAPSHOT;
+  serverTime: number;
+  players: PlayerSnapshot[];
+  ackSeqByPlayerId?: Record<string, number>;
 }
 
 export interface PongMessage extends BaseMessage {
   type: MessageType.PONG;
-  timestamp: number;
+  t: number;
+  serverTime: number;
 }
 
-export type ClientMessage = JoinMessage | MoveMessage | PingMessage;
-export type ServerMessage = WelcomeMessage | PlayerJoinedMessage | PlayerLeftMessage | StateUpdateMessage | PongMessage;
+export interface PlayerLeftMessage extends BaseMessage {
+  type: MessageType.PLAYER_LEFT;
+  id: string;
+}
+
+export type ClientMessage = JoinMessage | InputMessage | PingMessage;
+export type ServerMessage = WelcomeMessage | SnapshotMessage | PongMessage | PlayerLeftMessage;
 export type Message = ClientMessage | ServerMessage;
