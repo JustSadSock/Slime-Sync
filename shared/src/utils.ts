@@ -17,3 +17,10 @@ export function generateRandomColor(): string {
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
+
+export function clampPlayerPosition(x: number, y: number, worldWidth: number, worldHeight: number, radius: number): { x: number; y: number } {
+  return {
+    x: clamp(x, radius, worldWidth - radius),
+    y: clamp(y, radius, worldHeight - radius),
+  };
+}

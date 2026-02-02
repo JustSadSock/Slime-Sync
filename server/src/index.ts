@@ -7,8 +7,10 @@ import {
   InputMessage,
   PlayerSnapshot,
   generateRandomColor,
+  clampPlayerPosition,
   WORLD_WIDTH,
   WORLD_HEIGHT,
+  PLAYER_RADIUS,
   PLAYER_SPEED,
   DASH_SPEED_MULTIPLIER,
   DASH_DURATION,
@@ -192,8 +194,10 @@ class GameServer {
     player.vy = dy * speed;
     player.x += player.vx * dt;
     player.y += player.vy * dt;
-    player.x = Math.max(0, Math.min(WORLD_WIDTH, player.x));
-    player.y = Math.max(0, Math.min(WORLD_HEIGHT, player.y));
+    
+    const clamped = clampPlayerPosition(player.x, player.y, WORLD_WIDTH, WORLD_HEIGHT, PLAYER_RADIUS);
+    player.x = clamped.x;
+    player.y = clamped.y;
 
     if (isDashing) {
       player.anim = 'dash';

@@ -14,9 +14,11 @@ import {
   PLAYER_RADIUS,
   PLAYER_SPEED,
   INTERPOLATION_DELAY,
+  RECONCILIATION_THRESHOLD,
+  clampPlayerPosition,
 } from '@slime-sync/shared';
 
-const RECONCILIATION_THRESHOLD = 5;
+const SNAPSHOT_RETENTION_MS = 1000;
 
 interface PendingInput {
   seq: number;
@@ -375,7 +377,7 @@ class Game {
     });
     
     // Keep only recent snapshots
-    const cutoff = serverTime - 1000;
+    const cutoff = serverTime - SNAPSHOT_RETENTION_MS;
     player.snapshots = player.snapshots.filter(s => s.timestamp > cutoff);
   }
   
@@ -434,10 +436,10 @@ class Game {
   
   private applyInput(x: number, y: number, dx: number, dy: number, dt: number): { x: number; y: number } {
     const speed = PLAYER_SPEED;
-    const newX = Math.max(PLAYER_RADIUS, Math.min(WORLD_WIDTH - PLAYER_RADIUS, x + dx * speed * dt));
-    const newY = Math.max(PLAYER_RADIUS, Math.min(WORLD_HEIGHT - PLAYER_RADIUS, y + dy * speed * dt));
+    const newX = x + dx * speed * dt;
+    const newY = y + dy * speed * dt;
     
-    return { x: newX, y: newY };
+    return clampPlayerPosition(newX, newY, WORLD_WIDTH, WORLD_HEIGHT, PLAYER_RADIUS);
   }
   
   private updatePlayer(dt: number): void {
