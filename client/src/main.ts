@@ -98,17 +98,13 @@ class Game {
 
   constructor() {
     // Setup canvas
-    const container = document.getElementById('game-container')!;
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = WORLD_WIDTH;
-    this.canvas.height = WORLD_HEIGHT;
+    this.canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d')!;
-    container.appendChild(this.canvas);
     
     // Get UI elements
     this.loginScreen = document.getElementById('login-screen')!;
     this.playerNameInput = document.getElementById('player-name') as HTMLInputElement;
-    this.joinButton = document.getElementById('join-button') as HTMLButtonElement;
+    this.joinButton = document.getElementById('connect-button') as HTMLButtonElement;
     this.connectionStatus = document.getElementById('connection-status')!;
     this.playerCountDisplay = document.getElementById('player-count')!;
     
@@ -570,7 +566,7 @@ class Game {
     this.drawDashButton();
     
     // Draw debug overlay
-    this.drawDebugOverlay();
+    this.updateDebugOverlay();
   }
   
   private drawPlayer(x: number, y: number, color: string, name: string, isOwn: boolean): void {
@@ -631,23 +627,20 @@ class Game {
     this.ctx.fillText('DASH', x, y);
   }
   
-  private drawDebugOverlay(): void {
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    this.ctx.fillRect(10, WORLD_HEIGHT - 70, 200, 60);
+  private updateDebugOverlay(): void {
+    // Update HTML debug overlay elements
+    const rttElement = document.getElementById('rtt');
+    const inputSeqElement = document.getElementById('input-seq');
     
-    this.ctx.fillStyle = '#00ff00';
-    this.ctx.font = '12px monospace';
-    this.ctx.textAlign = 'left';
-    this.ctx.textBaseline = 'top';
+    if (rttElement) {
+      rttElement.textContent = this.rtt > 0 ? Math.round(this.rtt).toString() : '-';
+    }
     
-    const status = this.isConnected ? 'Connected' : 'Disconnected';
-    const rttText = this.rtt > 0 ? `${Math.round(this.rtt)}ms` : 'N/A';
-    const playerCount = this.otherPlayers.size + (this.playerId ? 1 : 0);
+    if (inputSeqElement) {
+      inputSeqElement.textContent = this.inputSeq.toString();
+    }
     
-    this.ctx.fillText(`Status: ${status}`, 15, WORLD_HEIGHT - 65);
-    this.ctx.fillText(`RTT: ${rttText}`, 15, WORLD_HEIGHT - 50);
-    this.ctx.fillText(`Players: ${playerCount}`, 15, WORLD_HEIGHT - 35);
-    this.ctx.fillText(`Seq: ${this.inputSeq}`, 15, WORLD_HEIGHT - 20);
+    // Player count is updated separately in handleSnapshot
   }
   
   private gameLoop(): void {

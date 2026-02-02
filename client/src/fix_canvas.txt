@@ -1,0 +1,5 @@
+    // Setup canvas
+    this.canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+    this.canvas.width = WORLD_WIDTH;
+    this.canvas.height = WORLD_HEIGHT;
+    this.ctx = this.canvas.getContext('2d')!;
