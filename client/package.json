@@ -1,0 +1,21 @@
+{
+  "name": "@slime-sync/client",
+  "version": "1.0.0",
+  "description": "Client application for Slime-Sync",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@slime-sync/shared": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11"
+  }
+}

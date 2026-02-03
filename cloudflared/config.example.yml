@@ -1,0 +1,33 @@
+# Cloudflare Tunnel Configuration Example
+# 
+# Place this file at: C:\Users\YourUsername\.cloudflared\config.yml (Windows)
+# Or: ~/.cloudflared/config.yml (Linux/Mac)
+#
+# DO NOT commit your actual config.yml with tunnel credentials!
+
+# Your tunnel UUID (get from: cloudflared tunnel list)
+tunnel: YOUR_TUNNEL_UUID_HERE
+
+# Credentials file (auto-generated when you create a tunnel)
+credentials-file: C:\Users\YourUsername\.cloudflared\YOUR_TUNNEL_UUID.json
+
+# Ingress rules - route traffic to your local services
+ingress:
+  # WebSocket endpoint - route /ws to local game server
+  - hostname: irgri.uk
+    path: /ws
+    service: ws://localhost:3001
+    originRequest:
+      noTLSVerify: true
+  
+  # HTTP health check endpoint
+  - hostname: irgri.uk
+    path: /health
+    service: http://localhost:3001
+  
+  # Catch-all rule (required) - returns 404 for other paths
+  - service: http_status:404
+
+# Optional: Logging
+# loglevel: info
+# logfile: cloudflared.log

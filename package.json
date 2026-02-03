@@ -1,0 +1,33 @@
+{
+  "name": "slime-sync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Real-time multiplayer slime game with WebSocket synchronization",
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\" --names \"server,client\" --prefix-colors \"blue,green\"",
+    "dev:client": "npm run dev --workspace=client",
+    "dev:server": "npm run dev --workspace=server",
+    "build:client": "npm run build --workspace=client",
+    "build:server": "npm run build --workspace=server",
+    "build:shared": "npm run build --workspace=shared",
+    "build": "npm run build:shared && npm run build:server && npm run build:client",
+    "start:server": "npm run start --workspace=server",
+    "host": "host.bat"
+  },
+  "keywords": [
+    "websocket",
+    "multiplayer",
+    "game",
+    "real-time"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

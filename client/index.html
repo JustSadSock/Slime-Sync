@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Slime-Sync</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        touch-action: none;
+      }
+
+      #app {
+        position: relative;
+      }
+
+      #game-canvas {
+        display: block;
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        background: #1a1a2e;
+      }
+
+      #login-screen {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.98);
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        z-index: 1000;
+        min-width: 300px;
+      }
+
+      #login-screen.hidden {
+        display: none;
+      }
+
+      #login-screen h1 {
+        color: #667eea;
+        margin-bottom: 10px;
+        font-size: 32px;
+      }
+
+      #login-screen .subtitle {
+        color: #666;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+
+      #login-screen input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      #login-screen input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      #login-screen button {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      #login-screen button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      #login-screen button:active {
+        transform: translateY(0);
+      }
+
+      #debug-overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 10px 15px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: 'Courier New', monospace;
+        line-height: 1.6;
+        pointer-events: none;
+        z-index: 100;
+      }
+
+      #debug-overlay .status {
+        font-weight: bold;
+      }
+
+      #debug-overlay .connected {
+        color: #4ade80;
+      }
+
+      #debug-overlay .disconnected {
+        color: #ef4444;
+      }
+
+      #disconnect-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 8px 16px;
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        z-index: 100;
+        transition: background 0.2s;
+      }
+
+      #disconnect-btn:hover {
+        background: rgba(220, 38, 38, 0.9);
+      }
+
+      #disconnect-btn.hidden {
+        display: none;
+      }
+
+      .controls-hint {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        padding: 8px 12px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border-radius: 6px;
+        font-size: 12px;
+        z-index: 100;
+        display: none;
+      }
+
+      @media (min-width: 768px) {
+        .controls-hint {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="login-screen">
+        <h1>🟢 Slime-Sync</h1>
+        <div class="subtitle">Real-time Multiplayer MVP</div>
+        <input 
+          type="text" 
+          id="player-name" 
+          placeholder="Enter your name" 
+          maxlength="20" 
+          autocomplete="off"
+        />
+        <button id="connect-button">Connect</button>
+      </div>
+      
+      <canvas id="game-canvas" width="800" height="450"></canvas>
+      
+      <div id="debug-overlay">
+        <div>Status: <span id="connection-status" class="status disconnected">Disconnected</span></div>
+        <div>RTT: <span id="rtt">-</span> ms</div>
+        <div>Players: <span id="player-count">0</span></div>
+        <div>Seq: <span id="input-seq">0</span></div>
+      </div>
+      
+      <button id="disconnect-btn" class="hidden">Disconnect</button>
+      
+      <div class="controls-hint">
+        WASD or Arrow Keys to move • Space to Dash
+      </div>
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
