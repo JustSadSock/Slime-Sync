@@ -1,3 +1,7 @@
+// Load environment variables from .env file
+import dotenv from 'dotenv';
+dotenv.config();
+
 import http from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import {
@@ -22,7 +26,7 @@ function parseEnvInt(name: string, value: string | undefined, defaultValue: numb
   if (!value) return defaultValue;
   const parsed = parseInt(value, 10);
   if (isNaN(parsed) || parsed < min || parsed > max) {
-    console.warn(`Invalid value for ${name}: "${value}", using default ${defaultValue}`);
+    console.warn(`[SERVER] Invalid value for ${name}: "${value}", using default ${defaultValue}`);
     return defaultValue;
   }
   return parsed;
@@ -31,6 +35,12 @@ function parseEnvInt(name: string, value: string | undefined, defaultValue: numb
 const PORT = parseEnvInt('PORT', process.env.PORT, 3001, 1, 65535);
 const TICK_HZ = parseEnvInt('TICK_HZ', process.env.TICK_HZ, 30, 1, 120);
 const SNAPSHOT_HZ = parseEnvInt('SNAPSHOT_HZ', process.env.SNAPSHOT_HZ, 15, 1, 60);
+
+console.log(`[SERVER] Configuration loaded:`);
+console.log(`[SERVER] - PORT: ${PORT}`);
+console.log(`[SERVER] - TICK_HZ: ${TICK_HZ}`);
+console.log(`[SERVER] - SNAPSHOT_HZ: ${SNAPSHOT_HZ}`);
+
 
 const TICK_INTERVAL = 1000 / TICK_HZ;
 const SNAPSHOT_INTERVAL = 1000 / SNAPSHOT_HZ;

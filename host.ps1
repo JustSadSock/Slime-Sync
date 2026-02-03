@@ -22,6 +22,22 @@ if (-not $cloudflared) {
 # Change to server directory
 Set-Location server
 
+# Create .env file from .env.example if it doesn't exist
+if (-not (Test-Path ".env")) {
+    if (Test-Path ".env.example") {
+        Write-Host "[INFO] Creating .env file from .env.example..." -ForegroundColor Yellow
+        Copy-Item ".env.example" ".env"
+    } else {
+        Write-Host "[INFO] Creating default .env file..." -ForegroundColor Yellow
+        @"
+# Server Configuration
+PORT=3001
+TICK_HZ=30
+SNAPSHOT_HZ=15
+"@ | Out-File -FilePath ".env" -Encoding UTF8
+    }
+}
+
 # Check if node_modules exists
 if (-not (Test-Path "node_modules")) {
     Write-Host "[INFO] Installing server dependencies..." -ForegroundColor Yellow
@@ -43,16 +59,31 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Start server in a new window
-Write-Host "[INFO] Starting server on port $env:PORT (default: 3001)..." -ForegroundColor Green
+Write-Host "[INFO] Starting server on port 3001..." -ForegroundColor Green
+Write-Host "[INFO] Server will run in a separate window." -ForegroundColor Yellow
+Write-Host "[INFO] Check that window for server output and errors." -ForegroundColor Yellow
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "node dist/index.js"
 
 # Wait for server to start
 Write-Host "[INFO] Waiting for server to initialize..." -ForegroundColor Yellow
-Start-Sleep -Seconds 3
+Start-Sleep -Seconds 5
+
+# Test if server is responding
+Write-Host "[INFO] Testing server connection..." -ForegroundColor Yellow
+try {
+    $response = Invoke-WebRequest -Uri "http://localhost:3001/health" -TimeoutSec 2 -ErrorAction SilentlyContinue
+    if ($response.StatusCode -eq 200) {
+        Write-Host "[SUCCESS] Server is running and responding on port 3001" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "[WARNING] Could not verify server is running. Check the server window for errors." -ForegroundColor Yellow
+    Write-Host "[INFO] Server should be accessible at http://localhost:3001" -ForegroundColor Cyan
+}
 
 Set-Location ..
 
 # Start Cloudflare Tunnel
+Write-Host ""
 Write-Host "[INFO] Starting Cloudflare Tunnel: irgri-tunnel" -ForegroundColor Green
 Write-Host "[INFO] Make sure your tunnel is configured in ~/.cloudflared/config.yml" -ForegroundColor Yellow
 Write-Host ""

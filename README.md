@@ -285,16 +285,31 @@ npm run build:shared # Compile shared types
 
 ## 🐛 Troubleshooting
 
+### Server won't start or can't be reached
+- ✅ **Check if .env file exists**: The server needs a `.env` file in the `server/` directory
+  - The `host.bat` or `host.ps1` scripts will create it automatically
+  - Or manually copy `server/.env.example` to `server/.env`
+- ✅ **Verify server is running**: 
+  - Check the server window that opens when running `host.bat`
+  - Test health endpoint: `curl http://localhost:3001/health` or visit in browser
+  - Should return: `{"status":"ok","players":0}`
+- ✅ **Check configuration**:
+  - Server logs should show: `[SERVER] Configuration loaded:`
+  - Default PORT is 3001
+  - If you see empty port value in logs, the .env file isn't being loaded
+
 ### Client can't connect to server
-- ✅ Check server is running: `http://localhost:3001/health`
-- ✅ Verify VITE_WS_URL matches server URL
-- ✅ Check browser console for errors
+- ✅ Verify server is running: `http://localhost:3001/health`
+- ✅ Check VITE_WS_URL matches server URL
+- ✅ Check browser console for WebSocket errors
+- ✅ For local testing, server should be on `ws://localhost:3001/ws`
 
 ### Cloudflare Tunnel not working
 - ✅ Run `cloudflared tunnel list` to verify tunnel exists
 - ✅ Check config.yml has correct tunnel UUID
 - ✅ Verify ingress rules in config.yml
 - ✅ Test locally first: `ws://localhost:3001/ws`
+- ✅ Make sure server is running before starting tunnel
 
 ### Players teleporting/jittering
 - ⚠️ High latency (>200ms) - check network connection
@@ -310,6 +325,12 @@ npm install
 # Rebuild all workspaces
 npm run build
 ```
+
+### Windows hosting issues
+- ✅ Make sure Node.js 18+ is installed
+- ✅ Run `npm install` in the project root first
+- ✅ The server runs in a separate window - check that window for errors
+- ✅ If port 3001 is in use, you can change it in `server/.env`
 
 ## 📚 Additional Resources
 
